@@ -3,9 +3,24 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
+import SignInDialog from "./SignInDialog";
+import SignUpDialog from "./SignUpDialog";
+import { useToast } from "@/components/ui/use-toast";
 
 const Navbar: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isSignInOpen, setIsSignInOpen] = useState(false);
+  const [isSignUpOpen, setIsSignUpOpen] = useState(false);
+  const { toast } = useToast();
+  const [cartCount, setCartCount] = useState(0);
+
+  const handleCartClick = () => {
+    setCartCount(prev => prev + 1);
+    toast({
+      title: "Added to cart",
+      description: "Item has been added to your cart.",
+    });
+  };
 
   return (
     <nav className="bg-white shadow-sm sticky top-0 z-50">
@@ -40,18 +55,24 @@ const Navbar: React.FC = () => {
               Categories
             </Link>
             <Link
-              to="/trending"
+              to="/deals"
               className="text-gray-700 hover:text-primary-light px-3 py-2 text-sm font-medium transition-colors"
             >
               Trending
             </Link>
             <div className="flex items-center space-x-4">
-              <Button variant="outline" size="sm" className="font-medium">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="font-medium"
+                onClick={() => setIsSignInOpen(true)}
+              >
                 Sign In
               </Button>
               <Button
                 size="sm"
                 className="bg-primary hover:bg-primary-dark text-white font-medium"
+                onClick={() => setIsSignUpOpen(true)}
               >
                 Sign Up
               </Button>
@@ -59,10 +80,11 @@ const Navbar: React.FC = () => {
                 variant="ghost" 
                 size="icon" 
                 className="relative ml-2"
+                onClick={handleCartClick}
               >
                 <ShoppingCart className="h-5 w-5" />
                 <span className="absolute -top-1 -right-1 bg-primary text-white text-xs w-4 h-4 rounded-full flex items-center justify-center">
-                  0
+                  {cartCount}
                 </span>
               </Button>
             </div>
@@ -110,7 +132,7 @@ const Navbar: React.FC = () => {
               Categories
             </Link>
             <Link
-              to="/trending"
+              to="/deals"
               className="block text-gray-700 hover:text-primary-light px-3 py-2 text-base font-medium"
               onClick={() => setIsMenuOpen(false)}
             >
@@ -120,28 +142,49 @@ const Navbar: React.FC = () => {
               <Button
                 variant="outline"
                 className="w-full justify-center font-medium"
-                onClick={() => setIsMenuOpen(false)}
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  setIsSignInOpen(true);
+                }}
               >
                 Sign In
               </Button>
               <Button
                 className="w-full justify-center bg-primary hover:bg-primary-dark text-white font-medium"
-                onClick={() => setIsMenuOpen(false)}
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  setIsSignUpOpen(true);
+                }}
               >
                 Sign Up
               </Button>
               <Button 
                 variant="ghost" 
                 className="flex items-center space-x-2 w-full justify-start font-medium"
-                onClick={() => setIsMenuOpen(false)}
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  handleCartClick();
+                }}
               >
                 <ShoppingCart className="h-5 w-5" />
-                <span>Cart (0)</span>
+                <span>Cart ({cartCount})</span>
               </Button>
             </div>
           </div>
         )}
       </div>
+
+      {/* Authentication Dialogs */}
+      <SignInDialog 
+        isOpen={isSignInOpen} 
+        onClose={() => setIsSignInOpen(false)} 
+        onSignUpClick={() => setIsSignUpOpen(true)} 
+      />
+      <SignUpDialog 
+        isOpen={isSignUpOpen} 
+        onClose={() => setIsSignUpOpen(false)} 
+        onSignInClick={() => setIsSignInOpen(true)} 
+      />
     </nav>
   );
 };
