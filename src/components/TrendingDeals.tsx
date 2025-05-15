@@ -1,6 +1,6 @@
 
-import React, { useRef, useEffect } from "react";
-import CouponCard from "./CouponCard";
+import React from "react";
+import CouponCard3D from "./CouponCard3D";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -120,24 +120,69 @@ const TrendingDeals: React.FC<TrendingDealsProps> = ({ showAll = false }) => {
   };
 
   return (
-    <section className="py-12 md:py-16">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-12 md:py-16 relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent z-0"></div>
+      
+      <motion.div 
+        className="absolute -top-32 -right-32 w-64 h-64 rounded-full bg-primary/10 blur-3xl z-0"
+        animate={{ 
+          scale: [1, 1.2, 1],
+          opacity: [0.3, 0.5, 0.3],
+        }}
+        transition={{ 
+          duration: 15,
+          repeat: Infinity,
+          repeatType: "reverse"
+        }}
+      />
+      
+      <motion.div 
+        className="absolute -bottom-32 -left-32 w-64 h-64 rounded-full bg-primary-light/10 blur-3xl z-0"
+        animate={{ 
+          scale: [1, 1.3, 1],
+          opacity: [0.2, 0.4, 0.2],
+        }}
+        transition={{ 
+          duration: 12,
+          repeat: Infinity,
+          repeatType: "reverse"
+        }}
+      />
+      
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {!showAll && (
           <div className="flex flex-col md:flex-row md:items-center justify-between mb-8">
             <div>
-              <h2 className="text-3xl md:text-4xl font-bold mb-2">Trending Deals</h2>
-              <p className="text-gray-600">
+              <motion.h2 
+                className="text-3xl md:text-4xl font-bold mb-2 bg-gradient-to-br from-primary to-primary-dark bg-clip-text text-transparent"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+              >
+                Trending Deals
+              </motion.h2>
+              <motion.p 
+                className="text-gray-600"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+              >
                 Most popular coupons and discounts right now
-              </p>
+              </motion.p>
             </div>
             <Link to="/deals">
-              <Button
-                variant="outline"
-                className="mt-4 md:mt-0 self-start md:self-center transform transition-all hover:scale-105 hover:shadow-md"
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
-                View All Deals
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+                <Button
+                  variant="outline"
+                  className="mt-4 md:mt-0 self-start md:self-center transition-all hover:shadow-md border-primary text-primary hover:bg-primary/10"
+                >
+                  View All Deals
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </motion.div>
             </Link>
           </div>
         )}
@@ -149,32 +194,49 @@ const TrendingDeals: React.FC<TrendingDealsProps> = ({ showAll = false }) => {
           animate="visible"
         >
           {allCoupons.map((coupon, index) => (
-            <motion.div key={index} variants={itemVariants}>
-              <div className="transform-gpu perspective-1000">
-                <div className="transform transition-all duration-300 hover:rotate-y-3 hover:rotate-x-3 hover:shadow-2xl">
-                  <CouponCard key={index} {...coupon} />
-                </div>
-              </div>
+            <motion.div key={index} variants={itemVariants} className="h-full">
+              <CouponCard3D key={index} {...coupon} />
             </motion.div>
           ))}
         </motion.div>
 
         {!showAll && (
-          <div className="mt-12 bg-gradient-to-r from-primary-light/20 to-primary/20 rounded-xl p-6 md:p-8 transform transition-all duration-300 hover:shadow-xl hover:scale-[1.01]">
-            <div className="flex flex-col md:flex-row items-center justify-between">
+          <motion.div 
+            className="mt-12 bg-gradient-to-r from-primary-light/20 to-primary/20 rounded-xl p-6 md:p-8 transform transition-all duration-300 hover:shadow-xl relative overflow-hidden"
+            whileHover={{ scale: 1.01 }}
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+          >
+            <motion.div 
+              className="absolute -top-16 -right-16 w-32 h-32 rounded-full bg-primary/30 blur-2xl z-0"
+              animate={{ 
+                x: [0, 10, 0], 
+                y: [0, 5, 0],
+              }}
+              transition={{ 
+                duration: 8, 
+                repeat: Infinity,
+                repeatType: "reverse"
+              }}
+            />
+            
+            <div className="flex flex-col md:flex-row items-center justify-between relative z-10">
               <div className="mb-6 md:mb-0">
-                <h3 className="text-2xl font-bold mb-2">
+                <h3 className="text-2xl font-bold mb-2 bg-gradient-to-r from-primary to-primary-dark bg-clip-text text-transparent">
                   Today's Featured Deal
                 </h3>
                 <p className="text-gray-700 mb-0">
                   Get 50% off on all subscriptions at Spotify Premium
                 </p>
               </div>
-              <Button className="bg-primary hover:bg-primary-dark text-white transform transition-all hover:scale-105">
-                Get This Deal
-              </Button>
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Button className="bg-primary hover:bg-primary-dark text-white shadow-lg">
+                  Get This Deal
+                </Button>
+              </motion.div>
             </div>
-          </div>
+          </motion.div>
         )}
       </div>
     </section>

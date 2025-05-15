@@ -1,11 +1,11 @@
 
 import React, { useState, useEffect } from "react";
 import Navbar from "@/components/Navbar";
-import CouponCard from "@/components/CouponCard";
+import CouponCard3D from "@/components/CouponCard3D";
 import Footer from "@/components/Footer";
 import FilterDialog from "@/components/FilterDialog";
 import AiRecommendationFilter from "@/components/AiRecommendationFilter";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 // Extended coupon data
 const allCoupons = [
@@ -124,12 +124,22 @@ const allCoupons = [
 const Deals = () => {
   const [displayedCoupons, setDisplayedCoupons] = useState(allCoupons);
   const [filterApplied, setFilterApplied] = useState(false);
+  const [scrollY, setScrollY] = useState(0);
 
   // Extract all stores and categories for filters
   const allStores = [...new Set(allCoupons.map((coupon) => coupon.store))];
   const allCategories = [
     ...new Set(allCoupons.flatMap((coupon) => coupon.tags)),
   ];
+  
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+    
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const handleApplyFilters = (filters) => {
     const { stores, categories, exclusiveOnly, verifiedOnly } = filters;
@@ -198,25 +208,72 @@ const Deals = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col relative overflow-hidden bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-800">
+      <motion.div 
+        className="absolute top-0 left-0 right-0 h-[500px] bg-gradient-to-b from-primary/10 to-transparent -z-10"
+        style={{ 
+          clipPath: "ellipse(80% 55% at 50% 0%)",
+        }}
+      />
+      
+      <motion.div 
+        className="absolute top-40 -left-32 w-64 h-64 rounded-full bg-primary-light/20 blur-3xl -z-10"
+        animate={{ 
+          scale: [1, 1.2, 1],
+          opacity: [0.2, 0.3, 0.2],
+        }}
+        transition={{ 
+          duration: 15,
+          repeat: Infinity,
+          repeatType: "reverse"
+        }}
+      />
+      
+      <motion.div 
+        className="absolute top-60 -right-32 w-64 h-64 rounded-full bg-primary/20 blur-3xl -z-10"
+        animate={{ 
+          scale: [1, 1.3, 1],
+          opacity: [0.1, 0.2, 0.1],
+        }}
+        transition={{ 
+          duration: 12,
+          repeat: Infinity,
+          repeatType: "reverse"
+        }}
+      />
+      
       <Navbar />
       <main className="flex-grow pt-8">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold mb-2">All Deals</h1>
-              <p className="text-gray-600">
+              <motion.h1 
+                className="text-3xl md:text-4xl font-bold mb-2 bg-gradient-to-br from-primary to-primary-dark bg-clip-text text-transparent"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6 }}
+              >
+                All Deals
+              </motion.h1>
+              <motion.p 
+                className="text-gray-600"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+              >
                 Browse all available coupons and discounts
-              </p>
+              </motion.p>
             </div>
             <div className="flex items-center gap-3 mt-4 md:mt-0">
               {filterApplied && (
-                <button
+                <motion.button
                   onClick={resetFilters}
                   className="text-primary hover:text-primary-dark transition-colors underline text-sm"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
                   Reset Filters
-                </button>
+                </motion.button>
               )}
               <FilterDialog
                 onApplyFilters={handleApplyFilters}
@@ -233,30 +290,39 @@ const Deals = () => {
           />
 
           {/* Deals Grid with Animation */}
-          <motion.div
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            {displayedCoupons.map((coupon, index) => (
-              <motion.div key={index} variants={itemVariants}>
-                <div className="transform-gpu perspective-1000">
-                  <div className="transform transition-all duration-300 hover:rotate-y-3 hover:rotate-x-3 hover:shadow-2xl">
-                    <CouponCard {...coupon} />
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={displayedCoupons.length}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+            >
+              {displayedCoupons.map((coupon, index) => (
+                <motion.div 
+                  key={coupon.store + index} 
+                  variants={itemVariants}
+                  layout
+                  className="h-full"
+                >
+                  <CouponCard3D {...coupon} />
+                </motion.div>
+              ))}
+            </motion.div>
+          </AnimatePresence>
 
           {displayedCoupons.length === 0 && (
-            <div className="text-center py-20">
+            <motion.div 
+              className="text-center py-20"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.4 }}
+            >
               <h3 className="text-xl font-medium mb-2">No matching deals found</h3>
               <p className="text-gray-600">
                 Try adjusting your filters to see more results
               </p>
-            </div>
+            </motion.div>
           )}
         </div>
       </main>
