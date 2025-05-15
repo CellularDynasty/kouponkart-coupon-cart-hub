@@ -1,7 +1,7 @@
 
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, Menu, X } from "lucide-react";
+import { ShoppingCart, Menu, X, Crown } from "lucide-react";
 import { Link } from "react-router-dom";
 import SignInDialog from "./SignInDialog";
 import SignUpDialog from "./SignUpDialog";
@@ -59,6 +59,13 @@ const Navbar: React.FC = () => {
               className="text-gray-700 hover:text-primary-light px-3 py-2 text-sm font-medium transition-colors"
             >
               Trending
+            </Link>
+            <Link
+              to="/subscriptions"
+              className="text-gray-700 hover:text-primary-light px-3 py-2 text-sm font-medium transition-colors flex items-center"
+            >
+              <Crown className="h-4 w-4 mr-1" />
+              Subscribe
             </Link>
             <div className="flex items-center space-x-4">
               <Button 
@@ -137,6 +144,14 @@ const Navbar: React.FC = () => {
               onClick={() => setIsMenuOpen(false)}
             >
               Trending
+            </Link>
+            <Link
+              to="/subscriptions"
+              className="block text-gray-700 hover:text-primary-light px-3 py-2 text-base font-medium flex items-center"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              <Crown className="h-4 w-4 mr-2" />
+              Subscribe
             </Link>
             <div className="pt-2 flex flex-col space-y-2">
               <Button
