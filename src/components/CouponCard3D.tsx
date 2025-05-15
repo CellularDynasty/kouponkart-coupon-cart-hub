@@ -20,6 +20,21 @@ interface CouponCard3DProps {
   isExclusive?: boolean;
 }
 
+const logoFallbacks = {
+  Amazon: "/logos/amazon.svg",
+  Walmart: "/logos/walmart.svg",
+  Nike: "/logos/nike.svg",
+  "Best Buy": "/logos/bestbuy.svg",
+  Target: "/logos/target.svg",
+  Apple: "/logos/apple.svg",
+  "Home Depot": "/logos/homedepot.svg",
+  Adidas: "/logos/adidas.svg",
+  eBay: "/logos/ebay.svg",
+  "Macy's": "/logos/macys.svg",
+  Costco: "/logos/costco.svg",
+  "Kohl's": "/logos/kohls.svg",
+};
+
 const CouponCard3D: React.FC<CouponCard3DProps> = ({
   store,
   logo,
@@ -36,7 +51,24 @@ const CouponCard3D: React.FC<CouponCard3DProps> = ({
   const [email, setEmail] = useState("");
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [rotation, setRotation] = useState({ x: 0, y: 0 });
+  const [logoError, setLogoError] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
+
+  // Get the appropriate logo, with fallbacks
+  const getLogo = () => {
+    if (!logoError && logo !== "/placeholder.svg") {
+      return logo;
+    }
+    
+    // Try to get a specific logo from our fallbacks
+    const fallbackLogo = logoFallbacks[store as keyof typeof logoFallbacks];
+    if (fallbackLogo) {
+      return fallbackLogo;
+    }
+    
+    // Default case - use first letter of store name
+    return "/placeholder.svg";
+  };
 
   const handleCopyCode = () => {
     navigator.clipboard.writeText(code);
@@ -119,9 +151,10 @@ const CouponCard3D: React.FC<CouponCard3DProps> = ({
                 <div className="flex items-center justify-between mb-4">
                   <div className="h-12 w-12 rounded-md flex-shrink-0 bg-white shadow-md flex items-center justify-center transform-gpu hover:translate-z-2 transition-transform duration-300" style={{ transform: "translateZ(10px)" }}>
                     <img
-                      src={logo}
+                      src={getLogo()}
                       alt={`${store} logo`}
                       className="h-8 w-8 object-contain"
+                      onError={() => setLogoError(true)}
                     />
                   </div>
                   <div className="space-x-2" style={{ transform: "translateZ(15px)" }}>
