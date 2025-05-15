@@ -1,5 +1,4 @@
-
-import React from "react";
+import React, { useState } from "react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
@@ -7,22 +6,61 @@ import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 
+const logoFallbacks = {
+  "Amazon": "/logos/amazon.svg",
+  "Walmart": "/logos/walmart.svg",
+  "Nike": "/logos/nike.svg",
+  "Best Buy": "/logos/bestbuy.svg",
+  "Target": "/logos/target.svg",
+  "Apple": "/logos/apple.svg",
+  "Home Depot": "/logos/homedepot.svg",
+  "Adidas": "/logos/adidas.svg",
+  "eBay": "/logos/ebay.svg",
+  "Macy's": "/logos/macys.svg",
+  "Costco": "/logos/costco.svg",
+  "Kohl's": "/logos/kohls.svg",
+};
+
 const storesList = [
   { name: "Amazon", logo: "/logos/amazon.svg", dealCount: 42, isPopular: true },
   { name: "Walmart", logo: "/logos/walmart.svg", dealCount: 38, isPopular: true },
   { name: "Nike", logo: "/logos/nike.svg", dealCount: 24, isPopular: true },
   { name: "Best Buy", logo: "/logos/bestbuy.svg", dealCount: 36, isPopular: true },
-  { name: "Target", logo: "/placeholder.svg", dealCount: 29, isPopular: false },
-  { name: "Apple", logo: "/placeholder.svg", dealCount: 18, isPopular: true },
-  { name: "Home Depot", logo: "/placeholder.svg", dealCount: 22, isPopular: false },
-  { name: "Adidas", logo: "/placeholder.svg", dealCount: 15, isPopular: false },
-  { name: "eBay", logo: "/placeholder.svg", dealCount: 31, isPopular: true },
-  { name: "Macy's", logo: "/placeholder.svg", dealCount: 27, isPopular: false },
-  { name: "Costco", logo: "/placeholder.svg", dealCount: 19, isPopular: false },
-  { name: "Kohl's", logo: "/placeholder.svg", dealCount: 24, isPopular: false },
+  { name: "Target", logo: "/logos/target.svg", dealCount: 29, isPopular: false },
+  { name: "Apple", logo: "/logos/apple.svg", dealCount: 18, isPopular: true },
+  { name: "Home Depot", logo: "/logos/homedepot.svg", dealCount: 22, isPopular: false },
+  { name: "Adidas", logo: "/logos/adidas.svg", dealCount: 15, isPopular: false },
+  { name: "eBay", logo: "/logos/ebay.svg", dealCount: 31, isPopular: true },
+  { name: "Macy's", logo: "/logos/macys.svg", dealCount: 27, isPopular: false },
+  { name: "Costco", logo: "/logos/costco.svg", dealCount: 19, isPopular: false },
+  { name: "Kohl's", logo: "/logos/kohls.svg", dealCount: 24, isPopular: false },
 ];
 
 const Stores = () => {
+  const [logoErrors, setLogoErrors] = useState<Record<string, boolean>>({});
+
+  const handleLogoError = (storeName: string) => {
+    setLogoErrors(prev => ({
+      ...prev,
+      [storeName]: true
+    }));
+  };
+
+  const getStoreLogo = (store: { name: string; logo: string }) => {
+    // If there was an error loading the logo, try to use a fallback logo
+    if (logoErrors[store.name]) {
+      return logoFallbacks[store.name as keyof typeof logoFallbacks] || 
+             `/placeholder.svg`;
+    }
+    
+    // Otherwise use the original logo
+    return store.logo;
+  };
+
+  const getStoreInitial = (name: string) => {
+    return name.charAt(0).toUpperCase();
+  };
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
@@ -42,11 +80,18 @@ const Stores = () => {
                   <CardContent className="p-4">
                     <div className="mb-4 w-full h-20 flex items-center justify-center bg-gray-50 rounded-md overflow-hidden">
                       <AspectRatio ratio={1 / 1} className="w-full h-full">
-                        <img
-                          src={store.logo}
-                          alt={`${store.name} logo`}
-                          className="object-contain p-2 w-full h-full transition-transform duration-300 group-hover:scale-110"
-                        />
+                        {logoErrors[store.name] && !logoFallbacks[store.name as keyof typeof logoFallbacks] ? (
+                          <div className="w-full h-full flex items-center justify-center bg-primary/10 text-primary font-bold text-2xl">
+                            {getStoreInitial(store.name)}
+                          </div>
+                        ) : (
+                          <img
+                            src={getStoreLogo(store)}
+                            alt={`${store.name} logo`}
+                            className="object-contain p-2 w-full h-full transition-transform duration-300 group-hover:scale-110"
+                            onError={() => handleLogoError(store.name)}
+                          />
+                        )}
                       </AspectRatio>
                     </div>
                     <div className="text-center">
