@@ -1,9 +1,10 @@
 
-import React from "react";
+import React, { useRef, useEffect } from "react";
 import CouponCard from "./CouponCard";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 
 interface TrendingDealsProps {
   showAll?: boolean;
@@ -95,6 +96,29 @@ const TrendingDeals: React.FC<TrendingDealsProps> = ({ showAll = false }) => {
     ? [...trendingCoupons, ...additionalCoupons]
     : trendingCoupons;
 
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        type: "spring",
+        stiffness: 100,
+        damping: 15,
+      },
+    },
+  };
+
   return (
     <section className="py-12 md:py-16">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -109,7 +133,7 @@ const TrendingDeals: React.FC<TrendingDealsProps> = ({ showAll = false }) => {
             <Link to="/deals">
               <Button
                 variant="outline"
-                className="mt-4 md:mt-0 self-start md:self-center"
+                className="mt-4 md:mt-0 self-start md:self-center transform transition-all hover:scale-105 hover:shadow-md"
               >
                 View All Deals
                 <ArrowRight className="ml-2 h-4 w-4" />
@@ -118,14 +142,25 @@ const TrendingDeals: React.FC<TrendingDealsProps> = ({ showAll = false }) => {
           </div>
         )}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <motion.div 
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
           {allCoupons.map((coupon, index) => (
-            <CouponCard key={index} {...coupon} />
+            <motion.div key={index} variants={itemVariants}>
+              <div className="transform-gpu perspective-1000">
+                <div className="transform transition-all duration-300 hover:rotate-y-3 hover:rotate-x-3 hover:shadow-2xl">
+                  <CouponCard key={index} {...coupon} />
+                </div>
+              </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
         {!showAll && (
-          <div className="mt-12 bg-gradient-to-r from-primary-light/20 to-primary/20 rounded-xl p-6 md:p-8">
+          <div className="mt-12 bg-gradient-to-r from-primary-light/20 to-primary/20 rounded-xl p-6 md:p-8 transform transition-all duration-300 hover:shadow-xl hover:scale-[1.01]">
             <div className="flex flex-col md:flex-row items-center justify-between">
               <div className="mb-6 md:mb-0">
                 <h3 className="text-2xl font-bold mb-2">
@@ -135,7 +170,7 @@ const TrendingDeals: React.FC<TrendingDealsProps> = ({ showAll = false }) => {
                   Get 50% off on all subscriptions at Spotify Premium
                 </p>
               </div>
-              <Button className="bg-primary hover:bg-primary-dark text-white">
+              <Button className="bg-primary hover:bg-primary-dark text-white transform transition-all hover:scale-105">
                 Get This Deal
               </Button>
             </div>
